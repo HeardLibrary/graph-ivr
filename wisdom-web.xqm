@@ -2,18 +2,14 @@
  : This module contains the interface for the Wisdom of the Elders telephony application. The interface is composed of a series of RESTXQ annotations.
  : @author Clifford B. Anderson
  :)
-module namespace page = 'http://library.vanderbilt.edu/wisdom';
+module namespace wisdom-web= "http://library.vanderbilt.edu/wisdom/web";
 
 (:~
- : Generates a welcome page.
- : @return HTML page
+ : Generates a welcome page for the Wisdom Digitized, Wisdom Multiplied site.
+ : @return HTML page using Boostrap
  :)
-declare
-  %rest:path("")
-  %output:method("html")
-  %output:omit-xml-declaration("no")
-  function page:start()
-  as element(html)
+
+declare function wisdom-web:start-website() as element(html)
 {
 <html lang="en">
 <head>
@@ -62,19 +58,4 @@ declare
     </div><!-- /.container -->
 </body>
 </html>
-};
-
-
-(:~
- : This function returns a "Hello, World" in TWIML XML.
- : @return response element
- :)
-declare
-  %rest:path("/hello")
-  %rest:GET
-  function page:hello() as element(Response)
-{
-<Response>
-  <Say voice="woman" language="en">Hello! I am the Wisdom of the Elders Telephony Application. Goodbye for now.</Say>
-</Response>
 };
