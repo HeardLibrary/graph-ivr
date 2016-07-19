@@ -40,3 +40,12 @@ declare
 {
   wisdom-neo4j:get-node-by-id($id)
 };
+
+declare
+  %rest:path("/traverse/{$id}")
+  %rest:query-param("Digits", "{$digits}")
+  %rest:GET
+  function wisdom-api:node($id as xs:integer, $digits as xs:integer) as element(Response)
+{
+  wisdom-neo4j:traverse-node-by-relationship-id($id, $digits)
+};
