@@ -27,7 +27,9 @@ declare function wisdom-neo4j:get-node-by-id($id as xs:integer) as element(Respo
       "statement" : "match (a {id:' || $id || '}) return a"
     } ]
   }'
- let $speech := wisdom-neo4j:http-request($json)//speech/string()
+ let $choice := wisdom-neo4j:http-request($json)//say/string()
+ let $options := wisdom-neo4j:get-node-relationships($id)
+ let $speech := fn:string-join(($choice, $options), " ")
  return wisdom-neo4j:return-twiml($id, $speech)
 };
 
@@ -40,6 +42,21 @@ declare function wisdom-neo4j:traverse-node-by-relationship-id($id as xs:integer
  }'
  let $destination-node := wisdom-neo4j:http-request($json)//_[@type="number"]/text()
  return wisdom-neo4j:get-node-by-id($destination-node)
+};
+
+declare function wisdom-neo4j:get-node-relationships($id as xs:integer) as xs:string?
+{
+  let $json := '{
+    "statements" : [ {
+       "statement": "match (a {id:' || $id || '})-[r]->(c) return r"
+    } ]
+  }'
+ let $results := wisdom-neo4j:http-request($json)
+ let $say :=
+   for $obj in $results//row/_
+   order by $obj/event/text()
+   return $obj/say
+ return fn:string-join($say, " ")
 };
 
 declare function wisdom-neo4j:return-twiml($id as xs:integer, $speech as xs:string) as element(Response)
