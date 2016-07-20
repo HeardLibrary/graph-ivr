@@ -9,7 +9,7 @@ declare variable $wisdom-neo4j:endpoint as xs:string := "http://wisdom:BY0GTs9f7
 declare function wisdom-neo4j:http-request($json as xs:string) as document-node()? {
   let $request :=
     <http:request method='post' href="{$wisdom-neo4j:endpoint}">
-      <http:body media-type='application/json'>
+      <http:body method="text" media-type='application/json'>
         {$json}
       </http:body>
    </http:request>
@@ -35,7 +35,7 @@ declare function wisdom-neo4j:traverse-node-by-relationship-id($id as xs:integer
 {
  let $json := '{
    "statements" : [ {
-      "statement": "match (a {id:'|| $id ||'})-[r {event:' || $digits || '}]-(c) return c.id"
+      "statement": "match (a {id:' || $id || '})-[r {event:' || $digits || '}]->(c) return c.id"
    } ]
  }'
  let $destination-node := wisdom-neo4j:http-request($json)//_[@type="number"]/text()
