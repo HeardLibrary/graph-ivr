@@ -33,15 +33,18 @@ declare function wisdom-neo4j:get-node-by-id($id as xs:integer) as element(Respo
  return wisdom-neo4j:return-twiml($id, $speech)
 };
 
-declare function wisdom-neo4j:traverse-node-by-relationship-id($id as xs:integer, $digits as xs:integer) as element(Response)
+declare function wisdom-neo4j:traverse-node-by-relationship-id($incoming-node as xs:integer, $digits as xs:integer?) as element(Response)
 {
  let $json := '{
    "statements" : [ {
-      "statement": "match (a {id:' || $id || '})-[r {event:' || $digits || '}]->(c) return c.id"
+      "statement": "match (a {id:' || $incoming-node || '})-[r {event:' || $digits || '}]->(c) return c.id"
    } ]
  }'
  let $destination-node := wisdom-neo4j:http-request($json)//_[@type="number"]/text()
- return wisdom-neo4j:get-node-by-id($destination-node)
+ return
+   if (fn:not(fn:empty($destination-node)))
+   then wisdom-neo4j:get-node-by-id($destination-node)
+   else wisdom-neo4j:get-node-by-id($incoming-node) (: return user to choices if invalid option selected :)
 };
 
 declare function wisdom-neo4j:get-node-relationships($id as xs:integer) as xs:string?
