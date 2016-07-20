@@ -8,7 +8,7 @@ import module namespace wisdom-web = "http://library.vanderbilt.edu/wisdom/web" 
 import module namespace wisdom-neo4j = "http://library.vanderbilt.edu/wisdom/neo4j" at "wisdom-neo4j.xqm";
 
 (:~
- : Generates a welcome page.
+ : Generates a welcome page in HTML for cosmetic purposes
  : @return HTML page
  :)
 declare
@@ -22,7 +22,7 @@ declare
 
 
 (:~
- : This function returns a "Hello, World" in TWIML XML.
+ : Returns the initial greeting from Node ID 0 in TWIML XML.
  : @return response element
  :)
 declare
@@ -33,6 +33,10 @@ declare
    wisdom-api:node(0)
 };
 
+(:~
+ : Returns the speech attribute from the selected node in TWIML XML.
+ : @return response element
+ :)
 declare
   %rest:path("/node/{$id}")
   %rest:GET
@@ -41,6 +45,10 @@ declare
   wisdom-neo4j:get-node-by-id($id)
 };
 
+(:~
+ : Traverses the starting node to an adjacent node by following the selected edge.
+ : @return response element
+ :)
 declare
   %rest:path("/traverse/{$id}")
   %rest:query-param("Digits", "{$digits}")
