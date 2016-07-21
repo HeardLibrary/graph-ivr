@@ -20,6 +20,23 @@ declare function wisdom-neo4j:http-request($json as xs:string) as document-node(
   return $body
 };
 
+declare function wisdom-neo4j:process-audio($choice as element(_)*, $options as element(_)*) as element()*
+{
+  let $choice-audio :=
+    for $say-or-play in $choice
+    return
+      if ($say-or-play/play) then <Play>{$say-or-play/play/text()}</Play>
+      else if ($say-or-play/say) then <Say voice="woman" language="en">{$say-or-play/say/text()}</Say>
+      else () (: In case neither say or play properties exist on node, which constitutes an error condition :)
+  let $option-audio :=
+    for $say-or-play in $options
+    return
+      if ($say-or-play/play) then <Play>{$say-or-play/play/text()}</Play>
+      else if ($say-or-play/say) then <Say voice="woman" language="en">{$say-or-play/say/text()}</Say>
+      else () (: In case neither say or play properties exist on node, which constitutes an error condition :)
+  return ($choice-audio, $option-audio)
+};
+
 declare function wisdom-neo4j:get-node-by-id($id as xs:integer) as element(Response)?
 {
  let $json := '{
@@ -27,11 +44,11 @@ declare function wisdom-neo4j:get-node-by-id($id as xs:integer) as element(Respo
       "statement" : "match (a {id:' || $id || '}) return a"
     } ]
   }'
- let $choice := wisdom-neo4j:http-request($json)
+ let $node := wisdom-neo4j:http-request($json)
+ let $choice := $node//row/_
  let $options := wisdom-neo4j:get-node-relationships($id)
- let $speech := fn:string-join(($choice//say/string(), $options), " ")
- let $voice := fn:string-join(($choice//voice/string()))
- return wisdom-neo4j:return-twiml($id, $speech, $voice)
+ let $audio := wisdom-neo4j:process-audio($choice, $options)
+ return wisdom-neo4j:return-twiml($id, $audio)
 };
 
 declare function wisdom-neo4j:traverse-node-by-relationship-id($incoming-node as xs:integer, $digits as xs:integer?) as element(Response)
@@ -48,32 +65,25 @@ declare function wisdom-neo4j:traverse-node-by-relationship-id($incoming-node as
    else wisdom-neo4j:get-node-by-id($incoming-node) (: return user to choices if invalid option selected :)
 };
 
-declare function wisdom-neo4j:get-node-relationships($id as xs:integer) as xs:string?
+declare function wisdom-neo4j:get-node-relationships($id as xs:integer) as element(_)*
 {
   let $json := '{
     "statements" : [ {
        "statement": "match (a {id:' || $id || '})-[r]->(c) return r"
     } ]
   }'
- let $results := wisdom-neo4j:http-request($json)
- let $say :=
-   for $obj in $results//row/_
-   order by $obj/event/text()
-   return $obj/say
- return fn:string-join($say, " ")
+ let $results := wisdom-neo4j:http-request($json)//row/_
+ for $obj in $results
+ order by $obj/event/text()
+ return $obj
 };
 
-declare function wisdom-neo4j:return-twiml($id as xs:integer, $speech as xs:string, $voice as xs:string*) as element(Response)
+declare function wisdom-neo4j:return-twiml($id as xs:integer, $audio as element()*) as element(Response)
 {
-  let $play :=
-    for $url in $voice
-    return <Play>{$url}</Play>
-return
   <Response>
     <Gather action="/telephony/traverse/{$id}" method="GET">
-        {$play}
-        <Say voice="woman" language="en">{$speech}</Say>
+        {$audio}
     </Gather>
-   <Say>We did not receive any input. Goodbye!</Say>
+   <Say voice="woman" language="en">We did not receive any input. Goodbye!</Say>
  </Response>
 };
