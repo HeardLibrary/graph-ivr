@@ -57,3 +57,21 @@ declare
 {
   wisdom-neo4j:traverse-node-by-relationship-id($id, $digits)
 };
+
+
+(:~
+ : Traverses the starting node to an adjacent node by following the selected edge.
+ : @return response element
+ :)
+declare
+  %updating
+  %rest:path("/record/{$id}")
+  %rest:query-param("Digits", "{$digits}")
+  %rest:query-param("RecordingUrl", "{$RecordingUrl}")
+  %rest:query-param("CallSid", "{$CallSid}")
+  %rest:GET
+  function wisdom-api:record($id as xs:integer, $digits as xs:string, $CallSid as xs:string, $RecordingUrl as xs:string?) as element(Response)
+{
+  (db:add("wisdom", <recording CallSid="{$CallSid}">{$RecordingUrl}</recording>, $CallSid || ".xml"),
+  wisdom-neo4j:traverse-node-by-relationship-id($id, $digits))
+};

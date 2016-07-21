@@ -100,17 +100,13 @@ declare function wisdom-neo4j:record-twiml($id as xs:integer, $audio as element(
 {
   <Response>
     {$audio}
-    <Say>
-        Please leave a message at the beep.
-        Press the star key when finished.
-    </Say>
     <Record
-        action="/telephony/traverse/{$id}"
+        action="/telephony/record/{$id}"
         method="GET"
         maxLength="20"
         finishOnKey="*"
         />
-    <Say>I did not receive a recording</Say>
+    <Say voice="woman" language="en">We did not receive any recording.</Say>
 </Response>
 };
 
