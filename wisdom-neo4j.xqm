@@ -33,7 +33,7 @@ declare function wisdom-neo4j:process-audio($choice as element(_)*, $options as 
     return
       if ($say-or-play/play) then <Play>{$say-or-play/play/text()}</Play>
       else if ($say-or-play/say) then <Say voice="woman" language="en">{$say-or-play/say/text()}</Say>
-      else () (: In case neither say or play properties exist on node, which constitutes an error condition :)
+      else () (: error condition :)
   return ($choice-audio, $option-audio)
 };
 
@@ -41,14 +41,32 @@ declare function wisdom-neo4j:get-node-by-id($id as xs:integer) as element(Respo
 {
  let $json := '{
     "statements" : [ {
-      "statement" : "match (a {id:' || $id || '}) return a"
+      "statement" : "match (a {id:' || $id || '}) return a, labels(a)"
     } ]
   }'
  let $node := wisdom-neo4j:http-request($json)
- let $choice := $node//row/_
- let $options := wisdom-neo4j:get-node-relationships($id)
- let $audio := wisdom-neo4j:process-audio($choice, $options)
- return wisdom-neo4j:return-twiml($id, $audio)
+ return
+   if ($node//row/_[@type="array"]/_/text() = "Record")
+   then wisdom-neo4j:gather-recording($id, $node)
+   else if ($node//row/_[@type="array"]/_/text() = "Choice")
+   then wisdom-neo4j:gather-response($id, $node)
+   else () (: error condition :)
+};
+
+declare function wisdom-neo4j:gather-recording($id as xs:integer, $node as document-node()?) as element(Response)?
+{
+  let $choice := $node//row/_
+  let $options := wisdom-neo4j:get-node-relationships($id)
+  let $audio := wisdom-neo4j:process-audio($choice, $options)
+  return wisdom-neo4j:record-twiml($id, $audio)
+};
+
+declare function wisdom-neo4j:gather-response($id as xs:integer, $node as document-node()?) as element(Response)?
+{
+  let $choice := $node//row/_
+  let $options := wisdom-neo4j:get-node-relationships($id)
+  let $audio := wisdom-neo4j:process-audio($choice, $options)
+  return wisdom-neo4j:return-twiml($id, $audio)
 };
 
 declare function wisdom-neo4j:traverse-node-by-relationship-id($incoming-node as xs:integer, $digits as xs:integer?) as element(Response)
@@ -76,6 +94,24 @@ declare function wisdom-neo4j:get-node-relationships($id as xs:integer) as eleme
  for $obj in $results
  order by $obj/event/text()
  return $obj
+};
+
+declare function wisdom-neo4j:record-twiml($id as xs:integer, $audio as element()*) as element(Response)
+{
+  <Response>
+    {$audio}
+    <Say>
+        Please leave a message at the beep.
+        Press the star key when finished.
+    </Say>
+    <Record
+        action="/telephony/traverse/{$id}?Digits=1"
+        method="GET"
+        maxLength="20"
+        finishOnKey="*"
+        />
+    <Say>I did not receive a recording</Say>
+</Response>
 };
 
 declare function wisdom-neo4j:return-twiml($id as xs:integer, $audio as element()*) as element(Response)
