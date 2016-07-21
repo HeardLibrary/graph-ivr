@@ -69,13 +69,13 @@ declare function wisdom-neo4j:gather-response($id as xs:integer, $node as docume
   return wisdom-neo4j:return-twiml($id, $audio)
 };
 
-declare function wisdom-neo4j:traverse-node-by-relationship-id($incoming-node as xs:integer, $digits as xs:integer?) as element(Response)
+declare function wisdom-neo4j:traverse-node-by-relationship-id($incoming-node as xs:integer, $digits as xs:string?) as element(Response)
 {
- let $json := '{
-   "statements" : [ {
-      "statement": "match (a {id:' || $incoming-node || '})-[r {event:' || $digits || '}]->(c) return c.id"
-   } ]
- }'
+  let $json := '{
+    "statements" : [ {
+       "statement": "match (a {id:' || $incoming-node || '})-[r {event:' || '''' || $digits || '''' || '}]->(c) return c.id"
+    } ]
+  }'
  let $destination-node := wisdom-neo4j:http-request($json)//_[@type="number"]/text()
  return
    if (fn:not(fn:empty($destination-node)))
@@ -105,7 +105,7 @@ declare function wisdom-neo4j:record-twiml($id as xs:integer, $audio as element(
         Press the star key when finished.
     </Say>
     <Record
-        action="/telephony/traverse/{$id}?Digits=1"
+        action="/telephony/traverse/{$id}"
         method="GET"
         maxLength="20"
         finishOnKey="*"
