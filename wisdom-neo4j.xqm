@@ -50,6 +50,8 @@ declare function wisdom-neo4j:get-node-by-id($id as xs:integer) as element(Respo
    then wisdom-neo4j:gather-recording($id, $node)
    else if ($node//row/_[@type="array"]/_/text() = "Choice")
    then wisdom-neo4j:gather-response($id, $node)
+   else if ($node//row/_[@type="array"]/_/text() = "Terminus")
+   then wisdom-neo4j:gather-goodbye($node)
    else () (: error condition :)
 };
 
@@ -58,8 +60,8 @@ declare function wisdom-neo4j:gather-recording($id as xs:integer, $node as docum
   let $choice := $node//row/_
   let $options := wisdom-neo4j:get-node-relationships($id)
   let $audio := wisdom-neo4j:process-audio($choice, $options)
-  let $info := $node//info/text()
-  return wisdom-neo4j:record-twiml($id, $audio, $info)
+  let $name := $node//name/text()
+  return wisdom-neo4j:record-twiml($id, $audio, $name)
 };
 
 declare function wisdom-neo4j:gather-response($id as xs:integer, $node as document-node()?) as element(Response)?
@@ -69,6 +71,15 @@ declare function wisdom-neo4j:gather-response($id as xs:integer, $node as docume
   let $audio := wisdom-neo4j:process-audio($choice, $options)
   return wisdom-neo4j:return-twiml($id, $audio)
 };
+
+declare function wisdom-neo4j:gather-goodbye($node as document-node()?) as element(Response)?
+{
+  let $goodbye := $node//row/_
+  let $options := ()
+  let $audio := wisdom-neo4j:process-audio($goodbye, $options)
+  return wisdom-neo4j:goodbye-twiml($audio)
+};
+
 
 declare function wisdom-neo4j:traverse-node-by-relationship-id($incoming-node as xs:integer, $digits as xs:string?) as element(Response)
 {
@@ -97,12 +108,12 @@ declare function wisdom-neo4j:get-node-relationships($id as xs:integer) as eleme
  return $obj
 };
 
-declare function wisdom-neo4j:record-twiml($id as xs:integer, $audio as element()*, $info as xs:string?) as element(Response)
+declare function wisdom-neo4j:record-twiml($id as xs:integer, $audio as element()*, $name as xs:string?) as element(Response)
 {
   <Response>
     {$audio}
     <Record
-        action="/telephony/record/{$id}?Info={$info}"
+        action="/telephony/record/{$id}?Name={$name}"
         method="GET"
         maxLength="20"
         finishOnKey="*"
@@ -118,5 +129,12 @@ declare function wisdom-neo4j:return-twiml($id as xs:integer, $audio as element(
         {$audio}
     </Gather>
    <Say voice="woman" language="en">We did not receive any input. Goodbye!</Say>
+ </Response>
+};
+
+declare function wisdom-neo4j:goodbye-twiml($audio as element()*) as element(Response)
+{
+  <Response>
+    {$audio}
  </Response>
 };
