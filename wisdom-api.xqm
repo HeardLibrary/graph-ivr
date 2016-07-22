@@ -66,12 +66,24 @@ declare
 declare
   %updating
   %rest:path("/record/{$id}")
-  %rest:query-param("Digits", "{$digits}")
-  %rest:query-param("RecordingUrl", "{$RecordingUrl}")
   %rest:query-param("CallSid", "{$CallSid}")
+  %rest:query-param("Digits", "{$Digits}")
+  %rest:query-param("From", "{$From}")
+  %rest:query-param("CallerName", "{$CallerName}")
+  %rest:query-param("Info", "{$Info}")
+  %rest:query-param("RecordingUrl", "{$RecordingUrl}")
   %rest:GET
-  function wisdom-api:record($id as xs:integer, $digits as xs:string, $CallSid as xs:string, $RecordingUrl as xs:string?) as element(Response)
+  function wisdom-api:record($id as xs:integer, $CallSid as xs:string, $CallerName as xs:string?, $Digits as xs:string, $From as xs:string?, $Info as xs:string?, $RecordingUrl as xs:string?) as element(Response)
 {
-  (db:add("wisdom", <recording CallSid="{$CallSid}">{$RecordingUrl}</recording>, $CallSid || ".xml"),
-  wisdom-neo4j:traverse-node-by-relationship-id($id, $digits))
+  let $call :=
+    <call CallSid="{$CallSid}" Info="{$Info}">
+      {if ($CallerName) then <CallerName>{$CallerName}</CallerName> else ()}
+      <From>{$From}</From>
+      <RecordingUrl>{$RecordingUrl}</RecordingUrl>
+    </call>
+  return
+  (
+    db:add("wisdom", $call, $CallSid || ".xml"),
+    wisdom-neo4j:traverse-node-by-relationship-id($id, $Digits)
+  )
 };

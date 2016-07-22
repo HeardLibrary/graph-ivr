@@ -58,7 +58,8 @@ declare function wisdom-neo4j:gather-recording($id as xs:integer, $node as docum
   let $choice := $node//row/_
   let $options := wisdom-neo4j:get-node-relationships($id)
   let $audio := wisdom-neo4j:process-audio($choice, $options)
-  return wisdom-neo4j:record-twiml($id, $audio)
+  let $info := $node//info/text()
+  return wisdom-neo4j:record-twiml($id, $audio, $info)
 };
 
 declare function wisdom-neo4j:gather-response($id as xs:integer, $node as document-node()?) as element(Response)?
@@ -96,12 +97,12 @@ declare function wisdom-neo4j:get-node-relationships($id as xs:integer) as eleme
  return $obj
 };
 
-declare function wisdom-neo4j:record-twiml($id as xs:integer, $audio as element()*) as element(Response)
+declare function wisdom-neo4j:record-twiml($id as xs:integer, $audio as element()*, $info as xs:string?) as element(Response)
 {
   <Response>
     {$audio}
     <Record
-        action="/telephony/record/{$id}"
+        action="/telephony/record/{$id}?Info={$info}"
         method="GET"
         maxLength="20"
         finishOnKey="*"
