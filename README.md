@@ -3,9 +3,9 @@
 
 ###Introduction
 
-The application operates an interactive voice response (IVR) system based on a directed property graph. This application allows you to build complex phone trees by arranging nodes and edges on a graph. An advantage of this approach is that it allows less technical users to manipulate the phone tree without needing to interact with the underlying code.
+The application configures an interactive voice response (IVR) system based on a directed property graph. This application allows you to build complex phone trees by arranging nodes and edges on a graph. An advantage of this approach is that it allows less technical users to manipulate the phone tree without needing to interact with the underlying application code.
 
-The application logic is written entirely in [XQuery 3.1](https://www.w3.org/TR/xquery-31/) along with graph query language is [Cypher](http://www.opencypher.org/).
+The application is written entirely in [XQuery 3.1](https://www.w3.org/TR/xquery-31/) and the graph query language [Cypher](http://www.opencypher.org/).
 
 ###Requirements
 
@@ -26,7 +26,7 @@ The application logic is written entirely in [XQuery 3.1](https://www.w3.org/TR/
 
 * Provision a telephone number with Twilio. If you do not already have a Twilio account, you will need to create one. After you have created your account, click on [Buy a Number](https://www.twilio.com/console/phone-numbers/search) from the Twilio console. After you have provisioned the number, click on [Manage your Incoming Phone Numbers](https://www.twilio.com/console/phone-numbers/incoming) and select your new number. Set a web hook for your incoming voice calls to the base-url of your website + "/node"
 
-![Creating a web hook with Twilio](http://i.imgur.com/IkXXUQa.png)
+    ![Creating a web hook with Twilio](http://i.imgur.com/IkXXUQa.png)
 
 * Set up Neo4j on an HTTP server. You may want to consider using a managed Neo4j host such as [Graphene](graphenedb.com). After you have set up Neo4j, make sure that you copy the connection string (with user name and password) for the Cypher endpoint. 
 
@@ -48,6 +48,6 @@ Record nodes must have one and only one Key edge. The edge should provide instru
 
 ![Record node with key edge](http://i.imgur.com/okMLPD3.png)
 
-Finally, a Terminus node ends the call. A terminus node must have only incoming edges and no outgoing Key edges. As with Choice edges, The required properties for Terminus nodes are "name," "say," and "id." The "play" property is optional. Normally, a Terminus edge should contain a message indicating that call will be coming to an end.
+Finally, a Terminus node ends the call. A terminus node must have only incoming edges and no outgoing Key edges. As with Choice edges, The required properties for Terminus nodes are "name," "say," and "id." The "play" property is optional. Normally, a Terminus node should contain a message indicating that call will be coming to an end.
 
 ![Terminus node with incoming edge](http://i.imgur.com/nIPiUGM.png)
