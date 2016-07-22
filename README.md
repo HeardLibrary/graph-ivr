@@ -19,3 +19,9 @@ The application produces an interactive voice response (IVR) system based on a d
 GraphIVR allows you to configure your IVR by manipulating a Neo4j graph. For instance, a simple phone tree may be modelled in Neo4j as follows:
 
 ![Graph of a simple IVR](http://i.imgur.com/pM9CaH0.png)
+
+There are three type of nodes in the graph: Choice, Record, and Terminus. A Choice node presents callers with branching options in the graph. A Record node allows callers to record information. A Terminus node ends the call. There is only a single type of edge in the graph: Key. A Key edge allows callers to traverse from one node to the next based on a keypad entry. 
+
+Choice nodes must have at least one Key edge. All the properties in the diagram below are required for Choice nodes and Key edges.
+
+![Choice node with key edge](http://i.imgur.com/tuxl8va.png)
