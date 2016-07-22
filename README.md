@@ -3,7 +3,9 @@
 
 ###Introduction
 
-The application operates an interactive voice response (IVR) system based on a directed property graph.
+The application operates an interactive voice response (IVR) system based on a directed property graph. This application allows you to build complex phone trees by arranging nodes and edges on a graph. An advantage of this approach is that it allows less technical users to manipulate the phone tree without needing to interact with the underlying code.
+
+The application logic is written entirely in [XQuery 3.1](https://www.w3.org/TR/xquery-31/) along with graph query language is [Cypher](http://www.opencypher.org/).
 
 ###Requirements
 
@@ -26,6 +28,9 @@ The application operates an interactive voice response (IVR) system based on a d
 
 ![Creating a web hook with Twilio](http://i.imgur.com/IkXXUQa.png)
 
+3. Set up Neo4j on an HTTP server. You may want to consider using a managed Neo4j host such as [Graphene](graphenedb.com). After you have set up Neo4j, make sure that you copy the connection string (with user name and password) for the Cypher endpoint. 
+
+4. Clone this repository and upload the three XQuery libraries (graphivr-api.xqm, graphivr-neo4j.xqm & graphivr-web.xqm) to the WEB-INF directory of your Basex HTTP Server. Change the connection string in graphivr-neoj.xqm (i.e. `declare variable $graphivr-neo4j:endpoint as xs:string := `) to your Neo4j connection string.
 
 ###Graph Model
 
