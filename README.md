@@ -18,4 +18,4 @@ The application produces an interactive voice response (IVR) system based on a d
 
 GraphIVR allows you to configure your IVR by manipulating a Neo4j graph. For instance, a simple phone tree may be modelled in Neo4j as follows:
 
-![Graph of a simple IVR](http://imgur.com/a/J1v3B)
+![Graph of a simple IVR](http://i.imgur.com/pM9CaH0.png)
