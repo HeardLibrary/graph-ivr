@@ -22,6 +22,10 @@ GraphIVR allows you to configure your IVR by manipulating a Neo4j graph. For ins
 
 There are three type of nodes in the graph: Choice, Record, and Terminus. A Choice node presents callers with branching options in the graph. A Record node allows callers to record information. A Terminus node ends the call. There is only a single type of edge in the graph: Key. A Key edge allows callers to traverse from one node to the next based on a keypad entry. 
 
-Choice nodes must have at least one Key edge. All the properties in the diagram below are required for Choice nodes and Key edges.
+Choice nodes must have at least one Key edge. The diagram below illustrates the available properties for Choice nodes and Key edges. The require properties for Choice nodes are "name," "say," and "id." The "play" property is optional. If a "play" property is present, GraphIVR will play the recorded sound at the indicated URL instead of speaking the phrases in the "say" property.
 
 ![Choice node with key edge](http://i.imgur.com/tuxl8va.png)
+
+Record nodes must have one and only one Key edge. The edge should provide instructions about how to terminate the recording. The required properties of Record nodes are "name" and "id." A "say" or "voice" property should not be placed on Record nodes.
+
+[Record node with key edge](http://i.imgur.com/okMLPD3.png)
