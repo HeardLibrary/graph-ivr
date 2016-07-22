@@ -1,22 +1,22 @@
 (:~
- : This module contains the interface for the Wisdom of the Elders telephony application. The interface is composed of a series of RESTXQ annotations.
+ : This module contains the interface for the GraphIVR telephony application. The interface is composed of a series of RESTXQ annotations.
  : @author Clifford B. Anderson
  :)
-module namespace wisdom-web= "http://library.vanderbilt.edu/wisdom/web";
+module namespace graphivr-web = "http://library.vanderbilt.edu/graphivr/web";
 
 (:~
  : Generates a welcome page for the Wisdom Digitized, Wisdom Multiplied site.
  : @return HTML page using Boostrap
  :)
 
-declare function wisdom-web:start-website() as element(html)
+declare function graphivr-web:start-website() as element(html)
 {
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Wisdom of the Elders</title>
+  <title>Graph IVR</title>
   <!--JQuery-->
 <script   src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous">&#32;</script>
   <!-- Bootstrap -->
@@ -35,7 +35,7 @@ declare function wisdom-web:start-website() as element(html)
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#">Wisdom Digitized, Wisdom Multiplied</a>
+          <a class="navbar-brand" href="#">GraphIVR</a>
         </div>
         <div id="navbar" class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
@@ -58,4 +58,40 @@ declare function wisdom-web:start-website() as element(html)
     </div><!-- /.container -->
 </body>
 </html>
+};
+
+declare function graphivr-web:generate-rss($database as xs:string) as element(rss) {
+
+ let $items :=
+  for $call in fn:collection($database)/call
+  return
+    <item>
+      <title>GraphIVR Recording</title>
+      <link>
+        {$call/RecordingUrl/text()}
+      </link>
+      <description>
+        A {$call/@Name/data()} from {$call/CallerName/text()} at {$call/From/text()} on {$call/@DateTime/data()}
+      </description>
+      <pubDate>{$call/@DateTime/data()}</pubDate>
+      <guid>
+        {$call/CallSid/data()}
+       </guid>
+  </item>
+ return
+  <rss version="2.0">
+    <channel>
+      <title>GraphIVR Feed</title>
+      <link>https://github.com/HeardLibrary/graph-ivr</link>
+      <description>Test recordings from a sample GraphIVR.</description>
+      <language>en-us</language>
+      <pubDate>{fn:current-dateTime()}</pubDate>
+      <lastBuildDate>{fn:current-dateTime()}</lastBuildDate>
+      <docs>http://blogs.law.harvard.edu/tech/rss</docs>
+      <generator>GraphIVR</generator>
+      <managingEditor>editor@example.com</managingEditor>
+      <webMaster>webmaster@example.com</webMaster>
+      {$items}
+    </channel>
+  </rss>
 };
