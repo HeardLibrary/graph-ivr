@@ -51,3 +51,7 @@ Record nodes must have one and only one Key edge. The edge should provide instru
 Finally, a Terminus node ends the call. A terminus node must have only incoming edges and no outgoing Key edges. As with Choice edges, The required properties for Terminus nodes are "name," "say," and "id." The "play" property is optional. Normally, a Terminus node should contain a message indicating that call will be coming to an end.
 
 ![Terminus node with incoming edge](http://i.imgur.com/nIPiUGM.png)
+
+## Credits
+
+This project arises from Dr. Ifeoma Nwankwo's (PI) [Wisdom Working Group](http://www.vanderbilt.edu/strategicplan/trans-institutional-programs/tips-2015awards/wisdom.php). Please credit this project in any citations or downstream uses of this software.
