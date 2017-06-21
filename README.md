@@ -60,7 +60,7 @@ Finally, a Terminus node ends the call. A terminus node must have only incoming 
 
 ## Privacy
 
-This application does not provide any privacy protections. It is not intended to function as a standalone application, but as a component of an encompassing system. By default, the application produces an RSS feed with identifying information of every caller. Please do not use in production without securing users' privacy and security.
+This application does not provide any privacy protections. It is not intended to function as a standalone application, but as a component of an encompassing system. By default, the application produces a public RSS feed with the personal information of every caller. Please do not use in production without securing users' privacy and security.
 
 ## Credits
 
