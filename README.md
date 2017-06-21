@@ -1,23 +1,26 @@
 # GraphIVR
 ## A Graph-based Interactive Voice Response (IVR) System
 
-###Introduction
+### Introduction
 
 The application configures an interactive voice response (IVR) system based on a directed property graph. This application allows you to build complex phone trees by arranging nodes and edges on a graph. An advantage of this approach is that it allows less technical users to manipulate the phone tree without needing to interact with the underlying application code.
 
 The application is written entirely in [XQuery 3.1](https://www.w3.org/TR/xquery-31/) and the graph query language [Cypher](http://www.opencypher.org/).
 
-###Requirements
+### Requirements
 
 * [BaseX](http://basex.org/), an open-source XML database with a built-in HTTP server.
 * [Neo4j](https://neo4j.com/), an open-source graph database.
 * [Twilio](https://www.twilio.com/), a cloud-based communications company with support for voice calls.
 
-###Installation
+### Installation
 
 * Download the [BaseX HTTP War](http://basex.org/products/download/) and upload it to either a Tomcat or Jetty server. If you need an easy way to host BaseX, you may want to try out Servint's [Jelastic PaaS](https://www.servint.net/product/jelastic/), which makes hosting Java applications very straightforward.
 
-* After you install BaseX on a server, make sure [to change the admin password](http://docs.basex.org/wiki/User_Management) and, if desired, update the [WebDav and REST passwords in the web.xml file](http://docs.basex.org/wiki/Web_Application#Configuration). Create a database [by sending a `put` command to BaseX's REST endpoint containing on the name of the database in the URL ](http://docs.basex.org/wiki/REST#PUT_Method). Finally, you also need to add support for `mixupdates` in the web.xml file by adding this XML snippet:
+* After you install BaseX on a server
+    * Make sure [to change the admin password](http://docs.basex.org/wiki/User_Management) and, if desired, update the [WebDav and REST passwords in the web.xml file](http://docs.basex.org/wiki/Web_Application#Configuration). 
+    * Create a database [by sending a `put` command to BaseX's REST endpoint containing on the name of the database in the URL ](http://docs.basex.org/wiki/REST#PUT_Method); if you 'graphivr' as the name of the database, the PUT request would be `http://localhost:8984/rest/graphivr`. 
+    * Finally, you also need to add support for `mixupdates` in the `web.xml` file by adding this XML snippet:
 
     ```xml
     <context-param>
@@ -35,7 +38,7 @@ The application is written entirely in [XQuery 3.1](https://www.w3.org/TR/xquery
 
 * Clone this repository and upload the three XQuery libraries (graphivr-api.xqm, graphivr-neo4j.xqm & graphivr-web.xqm) to the WEB-INF directory of your Basex HTTP Server. Change the connection string in graphivr-neoj.xqm (i.e. `declare variable $graphivr-neo4j:endpoint as xs:string := `) to your Neo4j connection string.
 
-###Graph Model
+### Graph Model
 
 GraphIVR allows you to configure your IVR by manipulating a Neo4j graph. For instance, a simple phone tree may be modelled in Neo4j as follows:
 
@@ -54,6 +57,10 @@ Record nodes must have one and only one Key edge. The edge should provide instru
 Finally, a Terminus node ends the call. A terminus node must have only incoming edges and no outgoing Key edges. As with Choice edges, The required properties for Terminus nodes are "name," "say," and "id." The "play" property is optional. Normally, a Terminus node should contain a message indicating that call will be coming to an end.
 
 ![Terminus node with incoming edge](http://i.imgur.com/nIPiUGM.png)
+
+## Privacy
+
+This application does not provide any privacy protections. It is not intended to function as a standalone application, but as a component of an encompassing system. By default, the application produces an RSS feed with identifying information of every caller. Please do not use in production without securing users' privacy and security.
 
 ## Credits
 
